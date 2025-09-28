@@ -1,0 +1,86 @@
+name: "RAG開発 8週間チェックリスト"
+description: "坂本龍馬風アシスタント RAG開発（8週間計画）のタスク管理用チェックリスト"
+title: "[Week X] タスク進捗確認"
+labels: ["RAG", "schedule"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ✅ RAG開発 8週間タスク進行表
+        進行中の週のタスクにチェックを入れて進めてください。
+
+  - type: checkboxes
+    id: week1
+    attributes:
+      label: "Week 1：環境&骨格づくり（MVPの土台）"
+      options:
+        - label: "GitHubリポジトリ作成"
+        - label: "S3バケット作成"
+        - label: "Aurora PostgreSQL（pgvector有効化）"
+        - label: "Djangoプロジェクト作成"
+        - label: "RDS接続確認"
+
+  - type: checkboxes
+    id: week2
+    attributes:
+      label: "Week 2：コーパス準備 & 取り込み基本"
+      options:
+        - label: "公有テキスト資料を収集しUTF-8整形"
+        - label: "S3に資料をアップロード"
+        - label: "クリーニング & 簡易メタ作成"
+
+  - type: checkboxes
+    id: week3
+    attributes:
+      label: "Week 3：埋め込み（Bedrock）→Aurora（最小ループ）"
+      options:
+        - label: "チャンク分割処理の実装"
+        - label: "Lambdaでベクトル化→AuroraにINSERT"
+        - label: "1本の文書がAuroraに登録されることを確認"
+
+  - type: checkboxes
+    id: week4
+    attributes:
+      label: "Week 4：バルク取り込み & 類似検索SQL"
+      options:
+        - label: "Lambdaで複数ファイル処理"
+        - label: "Auroraにivfflatインデックス作成"
+        - label: "検索SQLで動作確認"
+
+  - type: checkboxes
+    id: week5
+    attributes:
+      label: "Week 5：オーケストレータAPI（Django, LangChain）"
+      options:
+        - label: "/api/ask エンドポイント実装"
+        - label: "Bedrockで回答生成"
+        - label: "curlで質問→回答+出典確認"
+
+  - type: checkboxes
+    id: week6
+    attributes:
+      label: "Week 6：フロント（UI）＋ログ"
+      options:
+        - label: "DjangoテンプレートでシンプルUI作成"
+        - label: "ログ保存処理を実装"
+        - label: "ブラウザで入力→回答が表示されることを確認"
+
+  - type: checkboxes
+    id: week7
+    attributes:
+      label: "Week 7：EC2デプロイ（開発用）"
+      options:
+        - label: "EC2インスタンス作成"
+        - label: "gunicorn + nginxで公開"
+        - label: "EC2のURLでRAGが動作することを確認"
+
+  - type: checkboxes
+    id: week8
+    attributes:
+      label: "Week 8：仕上げ & 軽い評価"
+      options:
+        - label: "回答テンプレ改善"
+        - label: "10問で評価実施"
+        - label: "README更新"
+
