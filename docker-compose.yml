@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  ryoma_front:
+    build:
+      context: ./ryoma_front
+      dockerfile: Dockerfile
+    container_name: ryoma_front
+    restart: always
+    networks:
+      - my-network
+    ports:
+      - "8000:8000"
+    volumes:
+      # ✅ ホスト側テンプレートをコンテナに同期
+      - ./ryoma_front/templates:/app/templates
+      # ✅ 静的ファイルも必要に応じて同期可能（任意）
+      - ./ryoma_front/staticfiles:/app/staticfiles
+
+networks:
+  my-network:
+    external: true
+
