@@ -32,7 +32,7 @@
     .frame{
       width:min(960px, 92vw);
       height:auto;
-      background:#d4d4d8;     /* ✅ 濃いめのグレーに変更 */
+      background:#d4d4d8;     /* 濃いめのグレー */
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       position:relative;
@@ -51,6 +51,7 @@
       letter-spacing:.06em;
       font-size: clamp(14px, 1.6vw, 18px);
       color:var(--ink);
+      z-index: 5;
     }
 
     /* 右上キャッチ */
@@ -62,6 +63,12 @@
       letter-spacing:.12em;
       color:#111827;
       opacity:.95;
+
+      background:#f2f2f2;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-family: "Noto Serif JP", serif;
+      z-index: 5;
     }
 
     /* 左カラム：ユーザー発話 */
@@ -123,6 +130,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      z-index: 1;
     }
     .photo{
       width:100%;
@@ -131,6 +139,7 @@
       align-items:center;
       justify-content:center;
       padding:6px;
+      z-index: 1;
     }
     .photo-inner{
       position:relative;
@@ -138,12 +147,11 @@
       height:100%;
       border-radius:14px;
       overflow:hidden;
-      
-      background:#f2f2f2;   /* ✅ 薄い明るめのグレー */
-      
+      background:#f2f2f2;
       box-shadow:
         inset 0 0 0 1px rgba(0,0,0,.06),
         0 14px 28px rgba(0,0,0,.09);
+      z-index: 1;
     }
     .photo-inner img{
       width:100%;
@@ -177,57 +185,45 @@
       .catch{ position:static; margin-left:auto; margin-top:6px; }
       .title{ position:static; margin-bottom:6px; }
     }
-    /* 見出しと“お手伝いします”を最前面に */
-    .title,
-    .catch {
-      position: absolute; /* 既に指定済みだが明示 */
-      z-index: 5;         /* ← これがポイント */
-    }
-
-    /* 右側パネル群は背面側にしておく */
-    .right,
-    .right .photo,
-    .right .photo-inner {
-      position: relative; /* 既に指定済みだが明示 */
-      z-index: 1;
-    }
-
-    /* 視認性を上げたい場合は半透明の下地を付ける（任意） */
-    .catch{
-      background:#f2f2f2;   /* ✅ 薄い明るめのグレー */
-      padding: 2px 8px;                  /* 任意 */
-      border-radius: 8px;                /* 任意 */
-      /* フォント変更はここ。後述 */
-      font-family: "Noto Serif JP", serif; /* ←ここを好みのフォントに */
-      font-weight: 700;                    /* お好みで */
-    }
   </style>
 </head>
 <body>
   <main class="wrap">
     <section class="frame" role="region" aria-label="メインビュー">
-      <!-- 左上の見出し（画像のレイアウトに合わせた位置） -->
       <div class="title">坂本龍馬風アシスタント - SampleUI - </div>
+      <div class="catch" id="catch">考え中なので、今しばし待つぜよ。。。</div>
 
-      <!-- 右上のキャッチ（画像の文言は必要に応じて差し替え） -->
-      <div class="catch">考え中なので、今しばし待つぜよ。。。</div>
-
-      <!-- 左：ユーザー吹き出し -->
       <div class="left">
         <div class="user-line">
           <figure class="avatar" aria-label="お爺さんアイコン">
             <img src="/assets/ojiisan_face.png" alt="お爺さんの顔" />
           </figure>
+
           <div class="bubble" aria-live="polite">
             <span class="who">ユーザー</span>
-            <!-- ↓テキストは任意で調整してください -->
-            <p>本日のおすすめや、ToDo の進め方を教えてくだされ。</p>
-            <p>（例）環境整備の続きから始めたいでごわす。</p>
+
+            <p style="margin:0 0 10px 0;">質問を入力して「龍馬に聞く」を押してくだされ。</p>
+
+            <textarea id="q"
+              rows="4"
+              placeholder="例：坂本龍馬は何をした人でごわすか？"
+              style="width:100%; box-sizing:border-box; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,.15); font-size:14px;"></textarea>
+
+            <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
+              <button id="btn"
+                style="cursor:pointer; padding:10px 14px; border:0; border-radius:10px; background:#111827; color:#fff; font-weight:700;">
+                龍馬に聞く
+              </button>
+              <span id="status" style="font-size:12px; color:#6b7280;"></span>
+            </div>
+
+            <div id="a"
+              style="margin-top:12px; padding:10px; border-radius:12px; background:rgba(255,255,255,.5); border:1px solid rgba(0,0,0,.08); display:none;">
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 右：龍馬イメージ -->
       <div class="right">
         <div class="photo">
           <div class="photo-inner">
@@ -238,7 +234,56 @@
       </div>
     </section>
   </main>
+
+  <script>
+    const $q = document.getElementById("q");
+    const $btn = document.getElementById("btn");
+    const $a = document.getElementById("a");
+    const $status = document.getElementById("status");
+    const $catch = document.getElementById("catch");
+
+    async function askRyoma() {
+      const question = ($q.value || "").trim();
+      if (!question) {
+        $status.textContent = "質問を入力してくだされ。";
+        return;
+      }
+
+      $status.textContent = "考え中なので、今しばし待つぜよ。。。(API呼び出し中)";
+      if ($catch) $catch.textContent = "考え中なので、今しばし待つぜよ。。。";
+      $a.style.display = "none";
+      $a.textContent = "";
+
+      try {
+        const res = await fetch("/api/ask_ryoma", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({question}),
+        });
+
+        if (!res.ok) {
+          const t = await res.text();
+          throw new Error(`HTTP ${res.status}: ${t}`);
+        }
+
+        const data = await res.json();
+        $a.textContent = data.answer || "(回答が空でごわす)";
+        $a.style.display = "block";
+        $status.textContent = "完了でごわす。";
+        if ($catch) $catch.textContent = "お手伝いしますぜよ。";
+      } catch (e) {
+        console.error(e);
+        $status.textContent = "失敗したでごわす。console と logs を確認してくだされ。";
+        $a.textContent = String(e);
+        $a.style.display = "block";
+        if ($catch) $catch.textContent = "しくじったぜよ。。。";
+      }
+    }
+
+    $btn.addEventListener("click", askRyoma);
+    $q.addEventListener("keydown", (ev) => {
+      if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") askRyoma();
+    });
+  </script>
 </body>
 </html>
-HTML
-

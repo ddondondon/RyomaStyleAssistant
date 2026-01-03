@@ -12,12 +12,21 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # ✅ ホスト側テンプレートをコンテナに同期
+      - ./ryoma_front/core:/app/core
+      - ./ryoma_front/ryoma_site:/app/ryoma_site
       - ./ryoma_front/templates:/app/templates
-      # ✅ 静的ファイルも必要に応じて同期可能（任意）
       - ./ryoma_front/staticfiles:/app/staticfiles
+    environment:
+      BEDROCK_EMBED_MODEL_ID: amazon.titan-embed-text-v2:0
+      PGHOST: database-1.cluster-chu8e42yize5.ap-northeast-1.rds.amazonaws.com
+      PGPORT: "5432"
+      PGDATABASE: ryoma_db
+      PGUSER: postgres
+      PGPASSWORD: ddonpassword
+      PGSSLMODE: require
+      AWS_REGION: ap-northeast-1
+      BEDROCK_LLM_PROFILE_ARN: arn:aws:bedrock:ap-northeast-1:713881796172:inference-profile/apac.amazon.nova-micro-v1:0
 
 networks:
   my-network:
     external: true
-
