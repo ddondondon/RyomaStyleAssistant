@@ -1,0 +1,126 @@
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+LoadModule ssl_module modules/mod_ssl.so
+LoadModule socache_shmcb_module modules/mod_socache_shmcb.so
+LoadModule rewrite_module modules/mod_rewrite.so
+
+Listen 443
+
+########################################
+# namakemonoapp.com : HTTP
+########################################
+<VirtualHost *:80>
+    ServerName namakemonoapp.com
+
+    # ===== bot / スキャン即遮断 =====
+    <LocationMatch "^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)">
+        Require all denied
+    </LocationMatch>
+
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)
+    RewriteRule .* - [F,L]
+    # ==================================
+
+    ProxyPreserveHost On
+
+    # API を Ryoma(Django)へ
+    ProxyPass "/api/"  "http://ryoma_front:8000/api/"
+    ProxyPassReverse "/api/"  "http://ryoma_front:8000/api/"
+
+    # フロント
+    ProxyPass "/" "http://namakemono_front:8080/"
+    ProxyPassReverse "/" "http://namakemono_front:8080/"
+</VirtualHost>
+
+########################################
+# namakemonoapp.com : HTTPS
+########################################
+<VirtualHost *:443>
+    ServerName namakemonoapp.com
+
+    SSLEngine on
+    SSLCertificateFile "/usr/local/apache2/conf/certs/fullchain.pem"
+    SSLCertificateKeyFile "/usr/local/apache2/conf/certs/privkey.pem"
+
+    # ===== bot / スキャン即遮断 =====
+    <LocationMatch "^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)">
+        Require all denied
+    </LocationMatch>
+
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)
+    RewriteRule .* - [F,L]
+    # ==================================
+
+    ProxyPreserveHost On
+    RequestHeader set X-Forwarded-Proto "https"
+
+    # API を Ryoma(Django)へ
+    ProxyPass "/api/"  "http://ryoma_front:8000/api/"
+    ProxyPassReverse "/api/"  "http://ryoma_front:8000/api/"
+
+    # フロント（ryoma_front を / に出す）
+    ProxyPass "/" "http://ryoma_front:8000/"
+    ProxyPassReverse "/" "http://ryoma_front:8000/"
+</VirtualHost>
+
+########################################
+# 54.64.192.162 : HTTP
+########################################
+<VirtualHost *:80>
+    ServerName 54.64.192.162
+
+    # ===== bot / スキャン即遮断 =====
+    <LocationMatch "^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)">
+        Require all denied
+    </LocationMatch>
+
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)
+    RewriteRule .* - [F,L]
+    # ==================================
+
+    ProxyPreserveHost On
+
+    # API を Ryoma(Django)へ
+    ProxyPass "/api/"  "http://ryoma_front:8000/api/"
+    ProxyPassReverse "/api/"  "http://ryoma_front:8000/api/"
+
+    # フロント
+    ProxyPass "/" "http://namakemono_front:8080/"
+    ProxyPassReverse "/" "http://namakemono_front:8080/"
+</VirtualHost>
+
+########################################
+# 54.64.192.162 : HTTPS
+########################################
+<VirtualHost *:443>
+    ServerName 54.64.192.162
+
+    SSLEngine on
+    SSLCertificateFile "/usr/local/apache2/conf/certs/fullchain.pem"
+    SSLCertificateKeyFile "/usr/local/apache2/conf/certs/privkey.pem"
+
+    # ===== bot / スキャン即遮断 =====
+    <LocationMatch "^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)">
+        Require all denied
+    </LocationMatch>
+
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/(wp-|\.env|cgi-bin|\.well-known|admin|bin|phpmyadmin)
+    RewriteRule .* - [F,L]
+    # ==================================
+
+    ProxyPreserveHost On
+    RequestHeader set X-Forwarded-Proto "https"
+
+    # API を Ryoma(Django)へ
+    ProxyPass "/api/"  "http://ryoma_front:8000/api/"
+    ProxyPassReverse "/api/"  "http://ryoma_front:8000/api/"
+
+    # フロント
+    ProxyPass "/" "http://namakemono_front:8080/"
+    ProxyPassReverse "/" "http://namakemono_front:8080/"
+</VirtualHost>
+
