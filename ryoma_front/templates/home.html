@@ -6,12 +6,12 @@
   <title>坂本龍馬風アシスタント | Home</title>
   <style>
     :root{
-      --bg:#f3f4f6;          /* ページ背景 */
-      --panel:#ffffff;       /* パネル背景 */
-      --ink:#1f2937;         /* 文字色 */
-      --sub:#6b7280;         /* サブ文字色 */
-      --accent:#f59e0b;      /* アクセント(吹き出し尾など) */
-      --bubble:#ffe8c7;      /* 吹き出し背景(薄い橙) */
+      --bg:#f3f4f6;
+      --ink:#1f2937;
+      --sub:#6b7280;
+      --accent:#f59e0b;
+      --bubble:#ffe8c7;      /* ユーザー吹き出し */
+      --ryoma:#f2f2f2;       /* 龍馬吹き出し */
       --shadow:0 10px 30px rgba(0,0,0,.10);
       --radius:18px;
     }
@@ -20,8 +20,8 @@
       margin:0;
       background:var(--bg);
       color:var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                   "Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+                  "Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
     }
     .wrap{
       min-height:100%;
@@ -31,8 +31,7 @@
     }
     .frame{
       width:min(960px, 92vw);
-      height:auto;
-      background:#d4d4d8;     /* 濃いめのグレー */
+      background:#d4d4d8;
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       position:relative;
@@ -43,35 +42,31 @@
       padding:28px;
     }
 
-    /* 見出し（左上） */
+    /* タイトル */
     .title{
       position:absolute;
       left:24px; top:18px;
       font-weight:700;
       letter-spacing:.06em;
-      font-size: clamp(14px, 1.6vw, 18px);
-      color:var(--ink);
-      z-index: 5;
+      font-size:clamp(14px, 1.6vw, 18px);
+      z-index:5;
     }
 
     /* 右上キャッチ */
     .catch{
       position:absolute;
       right:28px; top:18px;
-      font-size: clamp(16px, 2vw, 22px);
+      font-size:clamp(16px, 2vw, 22px);
       font-weight:700;
       letter-spacing:.12em;
-      color:#111827;
-      opacity:.95;
-
       background:#f2f2f2;
-      padding: 2px 8px;
-      border-radius: 8px;
-      font-family: "Noto Serif JP", serif;
-      z-index: 5;
+      padding:2px 8px;
+      border-radius:8px;
+      font-family:"Noto Serif JP", serif;
+      z-index:6;
     }
 
-    /* 左カラム：ユーザー発話 */
+    /* 左：ユーザー */
     .left{
       display:flex;
       flex-direction:column;
@@ -99,7 +94,7 @@
       max-width:min(440px, 38vw);
       background:var(--bubble);
       border-radius:16px;
-      padding:14px 16px 14px 16px;
+      padding:14px 16px;
       line-height:1.6;
       box-shadow:0 6px 18px rgba(0,0,0,.10);
       border:1px solid rgba(0,0,0,.05);
@@ -111,7 +106,7 @@
       border-width:10px 10px 10px 0;
       border-style:solid;
       border-color:transparent var(--bubble) transparent transparent;
-      filter: drop-shadow(-1px 1px 0 rgba(0,0,0,.05));
+      filter:drop-shadow(-1px 1px 0 rgba(0,0,0,.05));
     }
     .bubble .who{
       display:inline-block;
@@ -121,16 +116,34 @@
     }
     .bubble p{
       margin:.2em 0 0;
-      font-size: clamp(12px, 1.3vw, 15px);
+      font-size:clamp(12px, 1.3vw, 15px);
     }
 
-    /* 右カラム：龍馬写真 */
+    /* ボタン（黒背景＋白文字） */
+    .btn{
+      cursor:pointer;
+      padding:10px 14px;
+      border:0;
+      border-radius:10px;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+    }
+    .btn:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+    }
+    .status{
+      font-size:12px;
+      color:#6b7280;
+    }
+
+    /* 右：白枠 */
     .right{
-      position:relative;
       display:flex;
       align-items:center;
       justify-content:center;
-      z-index: 1;
+      padding-right:6px;
     }
     .photo{
       width:100%;
@@ -139,29 +152,20 @@
       align-items:center;
       justify-content:center;
       padding:6px;
-      z-index: 1;
     }
     .photo-inner{
       position:relative;
       width:100%;
       height:100%;
+      min-height:620px;
       border-radius:14px;
       overflow:hidden;
-      background:#f2f2f2;
-      box-shadow:
-        inset 0 0 0 1px rgba(0,0,0,.06),
-        0 14px 28px rgba(0,0,0,.09);
-      z-index: 1;
-    }
-    .photo-inner img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center;
-      filter: grayscale(35%);
+      background:#ffffff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06),
+                  0 14px 28px rgba(0,0,0,.09);
     }
 
-    /* 右下ワンポイント（小さな丸） */
+    /* 右下ドット（API呼び出し中のみ表示させるので初期は非表示） */
     .dot{
       position:absolute;
       right:14px; bottom:14px;
@@ -169,21 +173,105 @@
       border-radius:50%;
       background:var(--accent);
       box-shadow:0 2px 6px rgba(0,0,0,.25);
+      z-index:5;
       opacity:.9;
+      display:none;  /* ★初期・回答時は非表示 */
     }
 
-    /* 画面が狭い時は縦積み */
+    /* ===== 初期/呼び出し中：ヒーロー（coverで大きく表示） ===== */
+    .ryoma-hero{
+      position:absolute;
+      inset:0;
+      display:block;
+    }
+    .ryoma-hero img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      filter:grayscale(35%);
+      display:block;
+      transform: scale(1.06);
+    }
+
+    /* ===== 回答表示：小さい写真＋吹き出し（白枠内） ===== */
+    .ryoma-chat{
+      position:absolute;
+      inset:0;
+      padding:18px 18px 44px 18px;
+      display:none;
+      overflow:auto;
+      background: rgba(255,255,255,.65);
+      backdrop-filter: blur(1px);
+    }
+    .ryoma-line{
+      display:flex;
+      justify-content:flex-end;
+      align-items:flex-start;
+      gap:12px;
+      padding-top:8px;
+    }
+    .ryoma-avatar{
+      width:56px;
+      height:56px;
+      border-radius:50%;
+      overflow:hidden;
+      box-shadow:0 4px 14px rgba(0,0,0,.15);
+      flex:0 0 auto;
+      background:#eee;
+    }
+    .ryoma-avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      filter:grayscale(35%);
+      transform:scale(1.15);
+      display:block;
+    }
+    .ryoma-bubble{
+      position:relative;
+      max-width:min(520px, 78%);
+      background:var(--ryoma);
+      border-radius:16px;
+      padding:14px 16px;
+      line-height:1.7;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+      border:1px solid rgba(0,0,0,.08);
+      display:none;
+    }
+    .ryoma-bubble::before{
+      content:"";
+      position:absolute;
+      right:-10px; top:18px;
+      border-width:10px 0 10px 10px;
+      border-style:solid;
+      border-color:transparent transparent transparent var(--ryoma);
+      filter:drop-shadow(1px 1px 0 rgba(0,0,0,.06));
+    }
+    .ryoma-bubble .who{
+      display:inline-block;
+      font-size:12px;
+      font-weight:700;
+      color:#374151;
+      opacity:.85;
+      margin-bottom:6px;
+      letter-spacing:.06em;
+    }
+    .ryoma-bubble .text{
+      white-space:pre-wrap;
+      font-size:clamp(12px, 1.25vw, 15px);
+    }
+
     @media (max-width: 820px){
-      .frame{
-        grid-template-columns: 1fr;
-        aspect-ratio:auto;
-        height:auto;
-      }
+      .frame{ grid-template-columns: 1fr; height:auto; }
       .right{ order:2; }
       .left{ order:1; padding-right:6px; }
       .bubble{ max-width:100%; }
       .catch{ position:static; margin-left:auto; margin-top:6px; }
       .title{ position:static; margin-bottom:6px; }
+      .photo-inner{ min-height:520px; }
+      .ryoma-hero img{ transform: scale(1.04); }
     }
   </style>
 </head>
@@ -193,6 +281,7 @@
       <div class="title">坂本龍馬風アシスタント - SampleUI - </div>
       <div class="catch" id="catch">考え中なので、今しばし待つぜよ。。。</div>
 
+      <!-- 左：ユーザー -->
       <div class="left">
         <div class="user-line">
           <figure class="avatar" aria-label="お爺さんアイコン">
@@ -210,25 +299,39 @@
               style="width:100%; box-sizing:border-box; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,.15); font-size:14px;"></textarea>
 
             <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
-              <button id="btn"
-                style="cursor:pointer; padding:10px 14px; border:0; border-radius:10px; background:#111827; color:#fff; font-weight:700;">
-                龍馬に聞く
-              </button>
-              <span id="status" style="font-size:12px; color:#6b7280;"></span>
-            </div>
-
-            <div id="a"
-              style="margin-top:12px; padding:10px; border-radius:12px; background:rgba(255,255,255,.5); border:1px solid rgba(0,0,0,.08); display:none;">
+              <button id="btn" class="btn">龍馬に聞く</button>
+              <span id="status" class="status"></span>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- 右：白枠の中でレイアウト切替 -->
       <div class="right">
         <div class="photo">
           <div class="photo-inner">
-            <img src="/assets/Ryoma_image.jpg" alt="坂本龍馬の写真" />
-            <div class="dot" aria-hidden="true"></div>
+
+            <!-- 初期/呼び出し中：大きい写真 -->
+            <div id="ryoma-hero" class="ryoma-hero" aria-label="龍馬写真（大）">
+              <img src="/assets/Ryoma_image.jpg" alt="坂本龍馬の写真" />
+            </div>
+
+            <!-- 回答時：小さい写真 + 吹き出し（白枠内） -->
+            <div id="ryoma-chat" class="ryoma-chat" aria-label="龍馬回答（チャット表示）">
+              <div class="ryoma-line">
+                <div id="a" class="ryoma-bubble">
+                  <span class="who">龍馬</span>
+                  <div class="text" id="a_text"></div>
+                </div>
+
+                <figure class="ryoma-avatar" aria-label="龍馬アイコン（小）">
+                  <img src="/assets/Ryoma_image.jpg" alt="坂本龍馬の写真（小）" />
+                </figure>
+              </div>
+            </div>
+
+            <!-- ★API呼び出し中のみ表示 -->
+            <div class="dot" id="loadingDot" aria-hidden="true"></div>
           </div>
         </div>
       </div>
@@ -238,9 +341,47 @@
   <script>
     const $q = document.getElementById("q");
     const $btn = document.getElementById("btn");
-    const $a = document.getElementById("a");
     const $status = document.getElementById("status");
     const $catch = document.getElementById("catch");
+
+    const $hero = document.getElementById("ryoma-hero");
+    const $chat = document.getElementById("ryoma-chat");
+
+    const $a = document.getElementById("a");
+    const $aText = document.getElementById("a_text");
+
+    const $loadingDot = document.getElementById("loadingDot");
+
+    function showHero() {
+      // 初期・API呼び出し中は大写真
+      $hero.style.display = "block";
+      $chat.style.display = "none";
+      $a.style.display = "none";
+      $aText.textContent = "";
+    }
+
+    function showChat(answerText) {
+      // 回答確定時のみチャット表示へ
+      $hero.style.display = "none";
+      $chat.style.display = "block";
+      $aText.textContent = answerText || "(回答が空でごわす)";
+      $a.style.display = "block";
+      $chat.scrollTop = 0;
+    }
+
+    function setLoading(isLoading) {
+      $btn.disabled = isLoading;
+      $q.disabled = isLoading;
+
+      // ★ドットはAPI呼び出し中のみ表示
+      if ($loadingDot) {
+        $loadingDot.style.display = isLoading ? "block" : "none";
+      }
+    }
+
+    // 初期はヒーロー、ドットなし
+    showHero();
+    setLoading(false);
 
     async function askRyoma() {
       const question = ($q.value || "").trim();
@@ -249,10 +390,12 @@
         return;
       }
 
+      // 呼び出し開始：ヒーロー（大写真） + ドット表示
+      showHero();
+      setLoading(true);
+
       $status.textContent = "考え中なので、今しばし待つぜよ。。。(API呼び出し中)";
       if ($catch) $catch.textContent = "考え中なので、今しばし待つぜよ。。。";
-      $a.style.display = "none";
-      $a.textContent = "";
 
       try {
         const res = await fetch("/api/ask_ryoma", {
@@ -267,16 +410,23 @@
         }
 
         const data = await res.json();
-        $a.textContent = data.answer || "(回答が空でごわす)";
-        $a.style.display = "block";
+
+        // 成功：チャット表示（この時点でドットは消える）
+        showChat(data.answer);
+
         $status.textContent = "完了でごわす。";
         if ($catch) $catch.textContent = "お手伝いしますぜよ。";
       } catch (e) {
         console.error(e);
+
+        // 失敗も“回答確定”扱いでチャットにエラーを表示
+        showChat(String(e));
+
         $status.textContent = "失敗したでごわす。console と logs を確認してくだされ。";
-        $a.textContent = String(e);
-        $a.style.display = "block";
         if ($catch) $catch.textContent = "しくじったぜよ。。。";
+      } finally {
+        // ★API終了：ドット非表示
+        setLoading(false);
       }
     }
 
@@ -287,3 +437,4 @@
   </script>
 </body>
 </html>
+
