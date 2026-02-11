@@ -279,7 +279,7 @@
   <main class="wrap">
     <section class="frame" role="region" aria-label="メインビュー">
       <div class="title">坂本龍馬風アシスタント - SampleUI - </div>
-      <div class="catch" id="catch">考え中なので、今しばし待つぜよ。。。</div>
+      <div class="catch" id="catch">お手伝いするぜよ</div>
 
       <!-- 左：ユーザー -->
       <div class="left">
@@ -394,7 +394,7 @@
       showHero();
       setLoading(true);
 
-      $status.textContent = "考え中なので、今しばし待つぜよ。。。(API呼び出し中)";
+      $status.textContent = "API呼び出し中";
       if ($catch) $catch.textContent = "考え中なので、今しばし待つぜよ。。。";
 
       try {
@@ -415,7 +415,7 @@
         showChat(data.answer);
 
         $status.textContent = "完了でごわす。";
-        if ($catch) $catch.textContent = "お手伝いしますぜよ。";
+        if ($catch) $catch.textContent = "回答するぜよ";
       } catch (e) {
         console.error(e);
 
